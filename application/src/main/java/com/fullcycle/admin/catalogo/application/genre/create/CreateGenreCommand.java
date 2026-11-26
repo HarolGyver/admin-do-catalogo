@@ -1,5 +1,6 @@
 package com.fullcycle.admin.catalogo.application.genre.create;
 
+import java.util.Collections;
 import java.util.List;
 
 public record CreateGenreCommand(
@@ -13,6 +14,10 @@ public record CreateGenreCommand(
             final Boolean isActive,
             final List<String> categories
     ) {
-        return new CreateGenreCommand(aName, isActive != null ? isActive : true, categories);
+        return new CreateGenreCommand(
+                aName,
+                isActive != null ? isActive : true,
+                categories != null ? categories : Collections.emptyList()
+        );
     }
 }
