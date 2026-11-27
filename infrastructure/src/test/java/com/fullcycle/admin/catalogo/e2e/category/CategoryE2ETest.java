@@ -1,9 +1,7 @@
 package com.fullcycle.admin.catalogo.e2e.category;
 
 import com.fullcycle.admin.catalogo.E2ETest;
-import com.fullcycle.admin.catalogo.domain.category.CategoryId;
-import com.fullcycle.admin.catalogo.infrastructure.category.models.CategoryResponse;
-import com.fullcycle.admin.catalogo.infrastructure.category.models.CreateCategoryRequest;
+import com.fullcycle.admin.catalogo.e2e.MockDsl;
 import com.fullcycle.admin.catalogo.infrastructure.category.models.UpdateCategoryRequest;
 import com.fullcycle.admin.catalogo.infrastructure.category.persistence.CategoryRepository;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mysql.MySQLContainer;
@@ -21,16 +18,13 @@ import tools.jackson.databind.ObjectMapper;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @E2ETest
 @Testcontainers
-public class CategoryE2ETest {
+public class CategoryE2ETest implements MockDsl {
 
     @Autowired
     private MockMvc mvc;
@@ -49,6 +43,16 @@ public class CategoryE2ETest {
             .withUsername("root")
             .withDatabaseName("adm_videos");
 
+    @Override
+    public MockMvc mvc() {
+        return this.mvc;
+    }
+
+    @Override
+    public ObjectMapper mapper() {
+        return this.mapper;
+    }
+
     @BeforeEach
     void cleanUp() {
         this.categoryRepository.deleteAll();
@@ -65,7 +69,7 @@ public class CategoryE2ETest {
 
         final var actualId = givenACategory(expectedName, expectedDescription, expectedIsActive);
 
-        final var actualCategory = retrieveACategory(actualId.getValue());
+        final var actualCategory = retrieveACategory(actualId);
 
         Assertions.assertEquals(expectedName, actualCategory.name());
         Assertions.assertEquals(expectedDescription, actualCategory.description());
@@ -165,7 +169,7 @@ public class CategoryE2ETest {
 
         final var actualId = givenACategory(expectedName, expectedDescription, expectedIsActive);
 
-        final var actualCategory = retrieveACategory(actualId.getValue());
+        final var actualCategory = retrieveACategory(actualId);
 
         Assertions.assertEquals(expectedName, actualCategory.name());
         Assertions.assertEquals(expectedDescription, actualCategory.description());
@@ -278,85 +282,5 @@ public class CategoryE2ETest {
                 .andExpect(status().isNoContent());
 
         Assertions.assertFalse(this.categoryRepository.existsById(actualId.getValue()));
-    }
-
-    private CategoryId givenACategory(
-            final String aName,
-            final String aDescription,
-            final boolean isActive
-    ) throws Exception {
-        final var aRequestBody = new CreateCategoryRequest(aName, aDescription, isActive);
-
-        final var aRequest = post("/categories")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(this.mapper.writeValueAsString(aRequestBody));
-
-        final var location = this.mvc.perform(aRequest)
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getHeader("Location");
-
-        Assertions.assertNotNull(location);
-        return CategoryId.from(location.replace("/categories/", ""));
-    }
-
-    private CategoryResponse retrieveACategory(final String anId) throws Exception {
-        final var aRequest = get("/categories/" + anId)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON);
-
-        final var json = this.mvc.perform(aRequest)
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        return this.mapper.readValue(json, CategoryResponse.class);
-    }
-
-    private ResultActions listCategories(final int page, final int perPage) throws Exception {
-        return listCategories(page, perPage, "", "", "");
-    }
-
-    private ResultActions listCategories(final int page, final int perPage, final String search) throws Exception {
-        return listCategories(page, perPage, search, "", "");
-    }
-
-    private ResultActions listCategories(
-            final int page,
-            final int perPage,
-            final String search,
-            final String sort,
-            final String direction
-    ) throws Exception {
-        final var aRequest = get("/categories")
-                .queryParam("page", String.valueOf(page))
-                .queryParam("perPage", String.valueOf(perPage))
-                .queryParam("search", search)
-                .queryParam("sort", sort)
-                .queryParam("dir", direction)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON);
-
-        return this.mvc.perform(aRequest);
-    }
-
-    private ResultActions updateACategory(
-            final CategoryId anId,
-            final UpdateCategoryRequest aRequestBody
-    ) throws Exception {
-        final var aRequest = put("/categories/" + anId.getValue())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(this.mapper.writeValueAsString(aRequestBody));
-
-        return this.mvc.perform(aRequest);
-    }
-
-    private ResultActions deleteACategory(final CategoryId anId) throws Exception {
-        final var aRequest = delete("/categories/" + anId.getValue())
-                .contentType(MediaType.APPLICATION_JSON);
-
-        return this.mvc.perform(aRequest);
     }
 }
