@@ -351,6 +351,35 @@ public class GenreTest {
     }
 
     @Test
+    public void givenAValidGenreWithTwoCategories_whenCallRemoveNonExistentCategory_thenShouldReceiveOK() {
+        final var seriesId = CategoryId.from("123");
+        final var moviesId = CategoryId.from("456");
+        final var nonExistentId = CategoryId.from("789");
+
+        final var expectedName = "Ação";
+        final var expectedIsActive = true;
+        final var expectedCategories = List.of(seriesId, moviesId);
+
+        final var actualGenre = Genre.newGenre(expectedName, expectedIsActive);
+        actualGenre.update(expectedName, expectedIsActive, List.of(seriesId, moviesId));
+
+        Assertions.assertEquals(2, actualGenre.getCategories().size());
+
+        final var actualCreatedAt = actualGenre.getCreatedAt();
+        final var actualUpdatedAt = actualGenre.getUpdatedAt();
+
+        actualGenre.removeCategory(nonExistentId);
+
+        Assertions.assertEquals(actualGenre.getId(), actualGenre.getId());
+        Assertions.assertEquals(expectedName, actualGenre.getName());
+        Assertions.assertEquals(expectedIsActive, actualGenre.isActive());
+        Assertions.assertEquals(expectedCategories, actualGenre.getCategories());
+        Assertions.assertEquals(actualCreatedAt, actualGenre.getCreatedAt());
+        Assertions.assertFalse(actualGenre.getUpdatedAt().isBefore(actualUpdatedAt));
+        Assertions.assertNull(actualGenre.getDeletedAt());
+    }
+
+    @Test
     public void givenAValidEmptyCategoriesGenre_whenCallAddCategories_thenShouldReceiveOK() {
         final var seriesId = CategoryId.from("123");
         final var moviesId = CategoryId.from("456");

@@ -205,6 +205,48 @@ public class UpdateGenreUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    public void givenAValidCommand_whenCallsUpdateGenreAndSomeCategoriesDoesNotExists_thenShouldReturnNotificationException() {
+        final var filmes = CategoryId.from("123");
+        final var series = CategoryId.from("456");
+        final var documentarios = CategoryId.from("789");
+
+        final var aGenre = Genre.newGenre("acao", true);
+
+        final var expectedId = aGenre.getId();
+        final var expectedName = "Ação";
+        final var expectedIsActive = true;
+        final var expectedCategories = List.of(filmes, series, documentarios);
+
+        final var expectedErrorCount = 1;
+        final var expectedErrorMessage = "Some categories could not be found: 456, 789";
+
+        final var aCommand = UpdateGenreCommand.with(
+                expectedId.getValue(),
+                expectedName,
+                expectedIsActive,
+                asString(expectedCategories)
+        );
+
+        when(genreGateway.findById(any()))
+                .thenReturn(Optional.of(Genre.with(aGenre)));
+
+        when(categoryGateway.existsByIds(any()))
+                .thenReturn(List.of(filmes));
+
+        final var actualException = Assertions.assertThrows(
+                NotificationException.class,
+                () -> useCase.execute(aCommand)
+        );
+
+        Assertions.assertEquals(expectedErrorCount, actualException.getErrors().size());
+        Assertions.assertEquals(expectedErrorMessage, actualException.getErrors().get(0).message());
+
+        Mockito.verify(genreGateway, times(1)).findById(eq(expectedId));
+        Mockito.verify(categoryGateway, times(1)).existsByIds(eq(expectedCategories));
+        Mockito.verify(genreGateway, times(0)).update(any());
+    }
+
+    @Test
     public void givenAnInvalidName_whenCallsUpdateGenreAndSomeCategoriesDoesNotExists_thenShouldReturnNotificationException() {
         final var filmes = CategoryId.from("123");
         final var series = CategoryId.from("456");

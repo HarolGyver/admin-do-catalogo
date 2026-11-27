@@ -108,6 +108,39 @@ public class UpdateGenreUseCaseIT {
         );
     }
 
+    @Test
+    public void givenAValidCommand_whenCallsUpdateGenreAndSomeCategoriesDoesNotExists_thenShouldReturnNotificationException() {
+        final var filmes = categoryGateway.create(Category.newCategory("Filmes", null, true));
+        final var series = CategoryId.from("456");
+
+        final var aGenre = genreGateway.create(Genre.newGenre("acao", true));
+
+        final var expectedName = "Ação";
+        final var expectedIsActive = true;
+        final var expectedCategories = List.of(filmes.getId(), series);
+        final var expectedErrorCount = 1;
+        final var expectedErrorMessage = "Some categories could not be found: 456";
+
+        final var aCommand = UpdateGenreCommand.with(
+                aGenre.getId().getValue(),
+                expectedName,
+                expectedIsActive,
+                asString(expectedCategories)
+        );
+
+        final var actualException = Assertions.assertThrows(
+                NotificationException.class,
+                () -> useCase.execute(aCommand)
+        );
+
+        Assertions.assertEquals(expectedErrorCount, actualException.getErrors().size());
+        Assertions.assertEquals(expectedErrorMessage, actualException.getErrors().get(0).message());
+
+        final var actualGenre = genreRepository.findWithCategoriesById(aGenre.getId().getValue()).orElseThrow();
+        Assertions.assertEquals("acao", actualGenre.getName());
+        Assertions.assertTrue(actualGenre.getCategoryIds().isEmpty());
+    }
+
     private List<String> asString(final List<CategoryId> ids) {
         return ids.stream()
                 .map(id -> id.getValue())
