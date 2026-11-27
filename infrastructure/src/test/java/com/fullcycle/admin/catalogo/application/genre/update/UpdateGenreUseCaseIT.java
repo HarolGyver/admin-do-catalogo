@@ -110,7 +110,7 @@ public class UpdateGenreUseCaseIT {
 
     private List<String> asString(final List<CategoryId> ids) {
         return ids.stream()
-                .map(CategoryId::getValue)
+                .map(id -> id.getValue())
                 .toList();
     }
 }

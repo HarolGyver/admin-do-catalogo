@@ -110,7 +110,7 @@ public class CreateGenreUseCaseIT {
 
     private List<String> asString(final List<CategoryId> categories) {
         return categories.stream()
-                .map(CategoryId::getValue)
+                .map(id -> id.getValue())
                 .toList();
     }
 }

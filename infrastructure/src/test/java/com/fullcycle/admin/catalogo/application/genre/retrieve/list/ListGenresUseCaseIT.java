@@ -2,7 +2,6 @@ package com.fullcycle.admin.catalogo.application.genre.retrieve.list;
 
 import com.fullcycle.admin.catalogo.IntegrationTest;
 import com.fullcycle.admin.catalogo.domain.genre.Genre;
-import com.fullcycle.admin.catalogo.domain.genre.GenreGateway;
 import com.fullcycle.admin.catalogo.domain.pagination.SearchQuery;
 import com.fullcycle.admin.catalogo.infrastructure.genre.persistence.GenreJpaEntity;
 import com.fullcycle.admin.catalogo.infrastructure.genre.persistence.GenreRepository;
@@ -17,9 +16,6 @@ public class ListGenresUseCaseIT {
 
     @Autowired
     private ListGenresUseCase useCase;
-
-    @Autowired
-    private GenreGateway genreGateway;
 
     @Autowired
     private GenreRepository genreRepository;
