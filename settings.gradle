@@ -1,4 +1,4 @@
-rootProject.name = 'admin-do-catalogo'
+rootProject.name = 'admin-do-catalogo-gatoflix'
 
 include 'domain'
 include 'application'

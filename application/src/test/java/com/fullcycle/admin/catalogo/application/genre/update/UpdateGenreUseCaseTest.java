@@ -248,6 +248,45 @@ public class UpdateGenreUseCaseTest extends UseCaseTest {
         Mockito.verify(genreGateway, times(0)).update(any());
     }
 
+    @Test
+    public void givenADuplicateCategoriesId_whenCallsUpdateGenre_thenShouldReturnNotificationException() {
+        final var filmes = CategoryId.from("123");
+        final var aGenre = Genre.newGenre("acao", true);
+
+        final var expectedId = aGenre.getId();
+        final var expectedName = "Ação";
+        final var expectedIsActive = true;
+        final var expectedCategories = List.of(filmes, filmes);
+
+        final var expectedErrorCount = 1;
+        final var expectedErrorMessage = "'categories_id' should not contain duplicate ids: 123";
+
+        final var aCommand = UpdateGenreCommand.with(
+                expectedId.getValue(),
+                expectedName,
+                expectedIsActive,
+                asString(expectedCategories)
+        );
+
+        when(genreGateway.findById(any()))
+                .thenReturn(Optional.of(Genre.with(aGenre)));
+
+        when(categoryGateway.existsByIds(any()))
+                .thenReturn(List.of(filmes));
+
+        final var actualException = Assertions.assertThrows(
+                NotificationException.class,
+                () -> useCase.execute(aCommand)
+        );
+
+        Assertions.assertEquals(expectedErrorCount, actualException.getErrors().size());
+        Assertions.assertEquals(expectedErrorMessage, actualException.getErrors().get(0).message());
+
+        Mockito.verify(genreGateway, times(1)).findById(eq(expectedId));
+        Mockito.verify(categoryGateway, times(1)).existsByIds(eq(List.of(filmes)));
+        Mockito.verify(genreGateway, times(0)).update(any());
+    }
+
     private List<String> asString(final List<CategoryId> ids) {
         return ids.stream()
                 .map(CategoryId::getValue)

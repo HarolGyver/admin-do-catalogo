@@ -1,5 +1,6 @@
 package com.fullcycle.admin.catalogo.application.genre.update;
 
+import java.util.Collections;
 import java.util.List;
 
 public record UpdateGenreCommand(
@@ -15,6 +16,11 @@ public record UpdateGenreCommand(
             final Boolean isActive,
             final List<String> categories
     ) {
-        return new UpdateGenreCommand(id, name, isActive != null ? isActive : true, categories);
+        return new UpdateGenreCommand(
+                id,
+                name,
+                isActive != null ? isActive : true,
+                categories != null ? categories : Collections.emptyList()
+        );
     }
 }

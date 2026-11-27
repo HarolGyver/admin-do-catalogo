@@ -244,6 +244,58 @@ public class CreateGenreUseCaseTest extends UseCaseTest {
         Mockito.verify(genreGateway, times(0)).create(any());
     }
 
+    @Test
+    public void givenADuplicateCategoriesId_whenCallsCreateGenre_thenShouldReturnNotificationException() {
+        final var filmes = CategoryId.from("123");
+        final var expectedName = "Ação";
+        final var expectedIsActive = true;
+        final var expectedCategories = List.of(filmes, filmes);
+
+        final var expectedErrorMessage = "'categories_id' should not contain duplicate ids: 123";
+        final var expectedErrorCount = 1;
+
+        when(categoryGateway.existsByIds(any()))
+                .thenReturn(List.of(filmes));
+
+        final var aCommand =
+                CreateGenreCommand.with(expectedName, expectedIsActive, asString(expectedCategories));
+
+        final var actualException = Assertions.assertThrows(
+                NotificationException.class,
+                () -> useCase.execute(aCommand)
+        );
+
+        Assertions.assertNotNull(actualException);
+        Assertions.assertEquals(expectedErrorCount, actualException.getErrors().size());
+        Assertions.assertEquals(expectedErrorMessage, actualException.getErrors().get(0).message());
+
+        Mockito.verify(categoryGateway, times(1)).existsByIds(List.of(filmes));
+        Mockito.verify(genreGateway, times(0)).create(any());
+    }
+
+    @Test
+    public void givenANullCategories_whenCallsCreateGenre_thenShouldReturnGenreIdWithEmptyCategories() {
+        final var expectedName = "Ação";
+        final var expectedIsActive = true;
+
+        final var aCommand = CreateGenreCommand.with(expectedName, expectedIsActive, null);
+
+        when(genreGateway.create(any()))
+                .thenAnswer(returnsFirstArg());
+
+        final var actualOutput = useCase.execute(aCommand);
+
+        Assertions.assertNotNull(actualOutput);
+        Assertions.assertNotNull(actualOutput.id());
+
+        Mockito.verify(categoryGateway, times(0)).existsByIds(any());
+        Mockito.verify(genreGateway, times(1)).create(argThat(aGenre ->
+                Objects.equals(expectedName, aGenre.getName())
+                        && Objects.equals(expectedIsActive, aGenre.isActive())
+                        && aGenre.getCategories().isEmpty()
+        ));
+    }
+
     private List<String> asString(final List<CategoryId> categories) {
         return categories.stream()
                 .map(CategoryId::getValue)

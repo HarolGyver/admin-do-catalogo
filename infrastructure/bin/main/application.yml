@@ -4,6 +4,8 @@ server:
     context-path: /api
 
 spring:
+  application:
+    name: admin-do-catalogo-gatoflix
   flyway:
     baseline-on-migrate: true
   datasource:
@@ -15,7 +17,7 @@ spring:
       idle-timeout: ${HIKARI_IDLE_TIMEOUT:300000}
       max-lifetime: ${HIKARI_MAX_LIFETIME:600000}
       keepalive-time: ${HIKARI_KEEPALIVE_TIME:300000}
-      pool-name: ${HIKARI_POOL_NAME:adm-videos-hikari-pool}
+      pool-name: ${HIKARI_POOL_NAME:gatoflix-adm-videos-hikari-pool}
   jpa:
     open-in-view: false
     show-sql: false
