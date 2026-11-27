@@ -31,14 +31,17 @@ admin-do-catalogo-gatoflix/
 ## Como Executar Localmente
 
 1. **Suba o banco de dados MySQL:**
+
    ```bash
    docker compose up -d
    ```
 
 2. **Inicie a aplicação com o profile `development`:**
+
    ```bash
    ./gradlew :infrastructure:bootRun --args='--spring.profiles.active=development'
    ```
+
    As migrations do Flyway são aplicadas automaticamente na inicialização da aplicação.
 
 3. **Acesse a API e a documentação Swagger:**
@@ -81,10 +84,13 @@ admin-do-catalogo-gatoflix/
 ## Executando os Testes
 
 - **Todos os módulos:**
+
   ```bash
   ./gradlew test
   ```
+
 - **Por módulo:**
+
   ```bash
   ./gradlew :domain:test
   ./gradlew :application:test
