@@ -90,7 +90,7 @@ public interface MockDsl {
             final boolean isActive,
             final List<CategoryId> categories
     ) throws Exception {
-        final var aRequestBody = new CreateGenreRequest(aName, mapTo(categories, CategoryId::getValue), isActive);
+        final var aRequestBody = new CreateGenreRequest(aName, mapTo(categories, id -> id.getValue()), isActive);
         final var actualId = this.given("/genres", aRequestBody);
         return GenreId.from(actualId);
     }

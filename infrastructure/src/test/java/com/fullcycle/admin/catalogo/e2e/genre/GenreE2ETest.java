@@ -214,7 +214,7 @@ public class GenreE2ETest implements MockDsl {
         Assertions.assertEquals(expectedName, actualGenre.name());
         Assertions.assertTrue(
                 expectedCategories.size() == actualGenre.categories().size()
-                        && mapTo(expectedCategories, CategoryId::getValue).containsAll(actualGenre.categories())
+                        && mapTo(expectedCategories, id -> id.getValue()).containsAll(actualGenre.categories())
         );
         Assertions.assertEquals(expectedIsActive, actualGenre.active());
         Assertions.assertNotNull(actualGenre.createdAt());
@@ -251,7 +251,7 @@ public class GenreE2ETest implements MockDsl {
 
         final var aRequestBody = new UpdateGenreRequest(
                 expectedName,
-                mapTo(expectedCategories, CategoryId::getValue),
+                mapTo(expectedCategories, id -> id.getValue()),
                 expectedIsActive
         );
 
@@ -286,7 +286,7 @@ public class GenreE2ETest implements MockDsl {
 
         final var aRequestBody = new UpdateGenreRequest(
                 expectedName,
-                mapTo(expectedCategories, CategoryId::getValue),
+                mapTo(expectedCategories, id -> id.getValue()),
                 expectedIsActive
         );
 
@@ -319,7 +319,7 @@ public class GenreE2ETest implements MockDsl {
 
         final var aRequestBody = new UpdateGenreRequest(
                 expectedName,
-                mapTo(expectedCategories, CategoryId::getValue),
+                mapTo(expectedCategories, id -> id.getValue()),
                 expectedIsActive
         );
 
