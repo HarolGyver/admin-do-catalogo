@@ -1,13 +1,13 @@
-# CodeFlix — Admin do Catálogo
+# GatoFlix — Admin do Catálogo
 
-Microsserviço backend responsável pela administração do catálogo de vídeos da plataforma CodeFlix, construído em Java com **Clean Architecture** e **Domain-Driven Design (DDD)**.
+Microsserviço backend responsável pela administração do catálogo de vídeos da plataforma GatoFlix, construído em Java com **Clean Architecture** e **Domain-Driven Design (DDD)**.
 
 ## Arquitetura do Projeto
 
 O projeto é organizado como um multi-módulo Gradle com separação estrita de responsabilidades:
 
 ```text
-admin-do-catalogo/
+admin-do-catalogo-gatoflix/
 ├── domain/          # Entidades, agregados, objetos de valor, validações, exceções e gateways (zero dependência de frameworks)
 ├── application/     # Casos de uso (UseCases), comandos, outputs e orquestração de regras de negócio
 └── infrastructure/  # Spring Boot, JPA/Hibernate, Flyway, MySQL, Controllers REST, OpenAPI e testes de integração/E2E
@@ -67,6 +67,16 @@ admin-do-catalogo/
 | `GET` | `/api/categories/{id}` | Busca uma categoria por ID |
 | `PUT` | `/api/categories/{id}` | Atualiza uma categoria por ID |
 | `DELETE` | `/api/categories/{id}` | Remove uma categoria por ID |
+
+### Gêneros (`/api/genres`)
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `POST` | `/api/genres` | Cria um novo gênero |
+| `GET` | `/api/genres` | Lista gêneros paginados (`search`, `page`, `perPage`, `sort`, `dir`) |
+| `GET` | `/api/genres/{id}` | Busca um gênero por ID |
+| `PUT` | `/api/genres/{id}` | Atualiza um gênero por ID |
+| `DELETE` | `/api/genres/{id}` | Remove um gênero por ID |
 
 ## Executando os Testes
 
