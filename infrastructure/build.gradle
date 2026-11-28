@@ -1,6 +1,17 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.flywaydb:flyway-mysql:12.11.0'
+        classpath 'com.mysql:mysql-connector-j:26.10.0'
+    }
+}
+
 plugins {
     id 'org.springframework.boot' version '4.2.0'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.flywaydb.flyway' version '12.11.0'
 }
 
 group = 'com.fullcycle.admin.catalogo.infrastructure'
@@ -9,6 +20,14 @@ version = '1.0-SNAPSHOT'
 bootJar {
     archiveFileName = 'application.jar'
     destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+}
+
+flyway {
+    url = System.getenv('MYSQL_URL') ?: 'jdbc:mysql://localhost:3306/adm_videos?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8'
+    user = System.getenv('MYSQL_USERNAME') ?: 'root'
+    password = System.getenv('MYSQL_PASSWORD') ?: '123456'
+    locations = ['filesystem:src/main/resources/db/migration']
+    baselineOnMigrate = true
 }
 
 dependencies {
